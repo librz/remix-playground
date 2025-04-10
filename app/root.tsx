@@ -17,6 +17,7 @@ import {
   type LinksFunction,
   type MetaFunction,
 } from "@remix-run/node";
+import { useEffect } from "react";
 
 import appStylesHref from "./app.css?url"; // url magic
 // existing imports
@@ -50,6 +51,13 @@ export default function App() {
   const { contacts, q } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const submit = useSubmit();
+
+  useEffect(() => {
+    const searchField = document.getElementById("q");
+    if (searchField instanceof HTMLInputElement) {
+      searchField.value = q || "";
+    }
+  }, [q]);
 
   return (
     <html lang="en">
