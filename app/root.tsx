@@ -9,8 +9,14 @@ import {
   redirect,
   useLoaderData,
   useNavigation, // navigation state: idle, loading, submitting
+  useSubmit,
 } from "@remix-run/react";
-import { json, type LinksFunction, type MetaFunction } from "@remix-run/node";
+import {
+  json,
+  LoaderFunctionArgs,
+  type LinksFunction,
+  type MetaFunction,
+} from "@remix-run/node";
 
 import appStylesHref from "./app.css?url"; // url magic
 // existing imports
@@ -28,9 +34,11 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader = async () => {
-  const contacts = await getContacts();
-  return json({ contacts });
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q");
+  const contacts = await getContacts(q);
+  return json({ contacts, q });
 };
 
 export const action = async () => {
@@ -39,8 +47,10 @@ export const action = async () => {
 };
 
 export default function App() {
-  const { contacts } = useLoaderData<typeof loader>();
+  const { contacts, q } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
+  const submit = useSubmit();
+
   return (
     <html lang="en">
       <head>
@@ -53,13 +63,20 @@ export default function App() {
         <div id="sidebar">
           <h1>Remix Contacts</h1>
           <div>
-            <Form id="search-form" role="search">
+            <Form
+              id="search-form"
+              role="search"
+              onChange={(e) => {
+                submit(e.currentTarget);
+              }}
+            >
               <input
                 id="q"
                 aria-label="Search contacts"
                 placeholder="Search"
                 type="search"
                 name="q"
+                defaultValue={q ?? ""}
               />
               <div id="search-spinner" aria-hidden hidden />
             </Form>
