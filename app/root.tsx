@@ -4,6 +4,7 @@ import {
   Links,
   Meta,
   Outlet,
+  redirect,
   Scripts,
   ScrollRestoration,
   useLoaderData,
@@ -33,7 +34,7 @@ export const loader = async () => {
 
 export const action = async () => {
   const contact = await createEmptyContact();
-  return json({ contact });
+  return redirect(`/contacts/${contact.id}/edit`);
 };
 
 export default function App() {
