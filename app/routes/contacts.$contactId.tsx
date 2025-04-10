@@ -8,6 +8,10 @@ import invariant from "tiny-invariant";
 export async function loader({ params }: LoaderFunctionArgs) {
   invariant(params.contactId, "Missing contactId param");
   const contact = await getContact(params.contactId);
+  // emulate isPending state of <NavLink />
+  await new Promise((resolve) => {
+    setTimeout(resolve, 2000);
+  });
   if (!contact) {
     throw new Response("Not Found", { status: 404 });
   }
